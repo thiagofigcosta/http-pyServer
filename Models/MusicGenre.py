@@ -4,7 +4,7 @@
 import json
 
 class MusicGenre(object):
-	def __init__(self, id:int, name:str):
+	def __init__(self, id, name):
 		self.id=id
 		self.name=name
 

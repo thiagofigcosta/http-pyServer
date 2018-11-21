@@ -13,14 +13,25 @@ class HTTPType(Enum):
 	GET=91603
 	POST=514320
 
+#criar classe para url de request, para reparar host, port, path, hash, e ?
+
 
 class HTTP(object):
+	#atributos
+	#version, type, data, status, contenttype, server, useragent, host, contentlength, accept, acceptlanguage, acceptencoding, connection, date, 
+
+
 	def __init__(self, requestdata:str):
 		lines=requestdata.split('\n')
 		rawfields={}
 		httpandversion=False
 		requesttype=False
 		readingdata=False
+
+
+		#simplificar, ler linha por linha na ordem, nao usar dicionario
+		#tem que ler a url de request tambem, usar split(' ') na primeira linha
+		#remover anotações
 
 		for line in lines:
 			if httpandversion==requesttype==False:
@@ -60,19 +71,20 @@ class HTTP(object):
 
 		if len(rawfields)>0: 
 			# TODO, atribuir dados do dicionario às variaveis self
+			print (rawfields)
+			pass
 
-
-		def toString() -> str:
-			# TODO
-
-
-	def __init__(self, status:StatusCode=StatusCode.OK, contenttype:str=None, body:str=None):
+	def __init__(self, status:StatusCode=StatusCode.OK, contenttype:str=None, data:str=None):
 		self.type=HTTPType.Response
 		self.status=status
 		self.contenttype=contenttype
-		self.body=body
+		self.data=data
 		self.version=1.1
 		self.server="nanoTech Pure HTTP PyServer - "+socket.gethostname()
+
+	def toString() -> str:
+		# TODO fazer metodo para gerar string do request a partir das variaveis de self disponiveis
+		pass
 
 	@staticmethod
 	def toJson(http):
@@ -81,3 +93,18 @@ class HTTP(object):
 	@staticmethod
 	def fromJson(json):
 		return json.loads(json, object_hook=lambda d: HTTP(**d))
+
+
+
+HTTP("""
+POST http://localhost:60464/api/student?age=15 HTTP/1.1
+User-Agent: Fiddler
+Host: localhost:60464
+Content-Type: application/json
+Content-Length: 13
+
+{
+  id:1,
+  name:'Steve'
+}
+	""")

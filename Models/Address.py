@@ -4,7 +4,7 @@
 import json
 
 class Address(object):
-	def __init__(self, id:int, zipcode:int, street:str, number:int, xtrainfo:str, district:str, city:str, state:str, country:str):
+	def __init__(self, id, zipcode, street, number, xtrainfo, district, city, state, country):
 		self.id=id
 		self.zipcode=zipcode
 		self.street=street

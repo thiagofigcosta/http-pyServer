@@ -4,7 +4,7 @@
 import json
 
 class Account(object):
-	def __init__(self, id:int, email:str, firstname:str, lastname:str, accesslevel:int, cpf:str, active:str, timeregistered:long):
+	def __init__(self, id, email, firstname, lastname, accesslevel, cpf, active, timeregistered):
 		self.id=id
 		self.email=email
 		self.firstname=firstname

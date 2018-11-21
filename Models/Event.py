@@ -6,7 +6,7 @@ from typing import List
 from MusicGenre import MusicGenre
 
 class Event(object):
-	def __init__(self, id:int, name:str, ticketprice:float, minimumage:int, startdate:long, enddate:long,musicgenres:List[MusicGenre]):
+	def __init__(self, id, name, ticketprice, minimumage, startdate, enddate, musicgenres):
 		self.id=id
 		self.name=name
 		self.ticketprice=ticketprice

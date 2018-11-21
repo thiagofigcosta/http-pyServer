@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import json
-from Address import Address
 
 class Nigthclub(object):
-	def __init__(self, id:int, name:str, cnpj:str, phone:str, email:str, address:Address):
+	def __init__(self, id, name, cnpj, phone, email, address, id_account):
 		self.id=id
 		self.name=name
 		self.cnpj=cnpj
 		self.phone=phone
 		self.email=email
 		self.address=address
+		self.id_account=id_account
 
 	@staticmethod
 	def toJson(nigthclub):
