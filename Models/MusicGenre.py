@@ -15,3 +15,7 @@ class MusicGenre(object):
 	@staticmethod
 	def fromJson(json):
 		return json.loads(json, object_hook=lambda d: MusicGenre(**d))
+
+	@staticmethod
+	def listToJson(musicgenres):
+		return "{\"musicgenres\":"+json.dumps([musicgenre.__dict__ for musicgenre in musicgenres])+"}"

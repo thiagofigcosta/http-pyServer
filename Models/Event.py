@@ -22,3 +22,7 @@ class Event(object):
 	@staticmethod
 	def fromJson(json):
 		return json.loads(json, object_hook=lambda d: Event(**d))
+
+	@staticmethod
+	def listToJson(events):
+		return "{\"events\":"+json.dumps([event.__dict__ for event in events])+"}"

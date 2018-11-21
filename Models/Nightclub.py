@@ -20,3 +20,7 @@ class Nigthclub(object):
 	@staticmethod
 	def fromJson(json):
 		return json.loads(json, object_hook=lambda d: Nigthclub(**d))
+
+	@staticmethod
+	def listToJson(nigthclubs):
+		return "{\"nigthclubs\":"+json.dumps([nigthclub.__dict__ for nigthclub in nigthclubs])+"}"

@@ -205,11 +205,5 @@ class SQLHandler(object):
 		self.query.execute("UPDATE accounts SET \"logintoken\"='"+logintoken+"' WHERE email='"+email+"';")
 		self.conn.commit()
 
-	
-
-
-	
-	
-
 	# LINK EVENT TO NIGHT, LINK NIGHT TO ADDRESS, LINK EVENT TO GENRES
-	# TODO implementar lists to json nos models
+	

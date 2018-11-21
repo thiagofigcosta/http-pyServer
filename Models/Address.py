@@ -22,3 +22,7 @@ class Address(object):
 	@staticmethod
 	def fromJson(json):
 		return json.loads(json, object_hook=lambda d: Address(**d))
+
+	@staticmethod
+	def listToJson(addresses):
+		return "{\"addresses\":"+json.dumps([address.__dict__ for address in addresses])+"}"

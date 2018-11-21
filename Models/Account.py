@@ -28,3 +28,7 @@ class Account(object):
 	@staticmethod
 	def fromJson(json):
 		return json.loads(json, object_hook=lambda d: Account(**d))
+
+	@staticmethod
+	def listToJson(accounts):
+		return "{\"accounts\":"+json.dumps([account.__dict__ for account in accounts])+"}"
