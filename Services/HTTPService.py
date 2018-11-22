@@ -27,23 +27,23 @@ class URL(object):
 
 		# Decode url hex chars %FF
 
-		idx=line.find("://")
+		idx=rawurl.find("://")
 		if idx>0:
 			self.protocol=rawurl[:idx].lower()
 			rawurl=rawurl[idx+len("://"):]
-		else
+		else:
 			self.protocol="http" #default	
-		idx=line.find(":")
+		idx=rawurl.find(":")
 		if idx>0:
 			self.domain=rawurl[:idx].lower()
 			rawurl=rawurl[idx+len(":"):]
-		else
+		else:
 			self.port=80 #default
-			idx=line.find("/")
+			idx=rawurl.find("/")
 			if idx>0:
 				self.domain=rawurl[:idx].lower() #really the domain?
 				rawurl=rawurl[idx+len("/"):]
-			else
+			else:
 				self.domain="." #default ?
 
 		hasQuery="?" in rawurl
@@ -51,13 +51,13 @@ class URL(object):
 
 		rawurl=rawurl.strip()
 		if hasQuery and hasFragment:
-			idx=line.find("#")
+			idx=rawurl.find("#")
 			if idx>0:
-				self.query=rawurl[idx+1:]
+				self.fragment=rawurl[idx+1:]
 				rawurl=rawurl[idx+len("#"):]
-			if rawurl[len(rawurl)-1]=='/'
+			if rawurl[len(rawurl)-1]=='/':
 				rawurl=rawurl[:len(rawurl)-1]
-			idx=line.find("?")
+			idx=rawurl.find("?")
 			if idx>0:
 				self.query=rawurl[idx+1:]
 				rawurl=rawurl[idx+len("?"):]
@@ -66,30 +66,30 @@ class URL(object):
 			self.resource=rawurl[lidx+1:]
 
 		if hasQuery and not hasFragment:
-			idx=line.find("?")
+			idx=rawurl.find("?")
 			if idx>0:
 				self.query=rawurl[idx+1:]
 				rawurl=rawurl[idx+len("?"):]
 			lidx=rawurl.rfind('/')
-			if rawurl[len(rawurl)-1]=='/'
+			if rawurl[len(rawurl)-1]=='/':
 				rawurl=rawurl[:len(rawurl)-1]
 			lidx=rawurl.rfind('/')
 			self.path=rawurl[:lidx]
 			self.resource=rawurl[lidx+1:]
 
 		if not hasQuery and hasFragment:
-			idx=line.find("#")
+			idx=rawurl.find("#")
 			if idx>0:
 				self.query=rawurl[idx+1:]
 				rawurl=rawurl[idx+len("#"):]
-			if rawurl[len(rawurl)-1]=='/'
+			if rawurl[len(rawurl)-1]=='/':
 				rawurl=rawurl[:len(rawurl)-1]
 			lidx=rawurl.rfind('/')
 			self.path=rawurl[:lidx]
 			self.resource=rawurl[lidx+1:]
 
 		if not hasQuery and not hasFragment:
-			if rawurl[len(rawurl)-1]=='/'
+			if rawurl[len(rawurl)-1]=='/':
 				rawurl=rawurl[:len(rawurl)-1]
 			lidx=rawurl.rfind('/')
 			self.path=rawurl[:lidx]
@@ -98,7 +98,7 @@ class URL(object):
 class HTTP(object):
 	def __init__(self, requestdata):
 		self.type=None
-		self.URL=None
+		self.url=None
 		self.version=None
 		self.data=None
 		self.useragent=None
@@ -129,7 +129,7 @@ class HTTP(object):
 						requesttype=True
 					else:
 						print ("erro") # TODO
-					self.URL=URL(url)
+					self.url=URL(url)
 					self.version=float(version.split('/')[1])
 					httpHeader=True
 
@@ -141,7 +141,7 @@ class HTTP(object):
 					idxOfSeparator=line.find(":")
 					if idxOfSeparator>0:
 						field=line[:idxOfSeparator].strip()
-						value=line[(idxOfSeparator+1):].sptrip()
+						value=line[(idxOfSeparator+1):].strip()
 						if field=="User-Agent":
 							self.useragent=value
 						elif field=="Content-Type":
@@ -163,22 +163,22 @@ class HTTP(object):
 			else:
 				self.data+=line+'\n'
 
-	def __init__(self, status=StatusCode.OK, contenttype=None, data=None):
-		self.URL=None
-		self.useragent=None
-		self.contentlength=None
-		self.host=None
-		self.accept=None
-		self.acceptlanguage=None
-		self.acceptencoding=None
-		self.connection=None
+	# def __init__(self, status, data, contenttype=None):
+	# 	self.url=None
+	# 	self.useragent=None
+	# 	self.contentlength=None
+	# 	self.host=None
+	# 	self.accept=None
+	# 	self.acceptlanguage=None
+	# 	self.acceptencoding=None
+	# 	self.connection=None
 
-		self.type=HTTPType.Response
-		self.status=status
-		self.contenttype=contenttype
-		self.data=data
-		self.version=1.1
-		self.server="nanoTech Pure HTTP PyServer - "+socket.gethostname()
+	# 	self.type=HTTPType.Response
+	# 	self.status=status
+	# 	self.contenttype=contenttype
+	# 	self.data=data
+	# 	self.version=1.1
+	# 	self.server="nanoTech Pure HTTP PyServer - "+socket.gethostname()
 
 	def toString():
 		# TODO fazer metodo para gerar string do request a partir das variaveis de self disponiveis
@@ -194,7 +194,7 @@ class HTTP(object):
 
 
 
-HTTP("""
+http=HTTP("""
 POST http://localhost:60464/api/student?age=15 HTTP/1.1
 User-Agent: Fiddler
 Host: localhost:60464
@@ -205,4 +205,4 @@ Content-Length: 13lines=reque
   id:1,
   name:'Steve'
 }
-	""")
+""")
