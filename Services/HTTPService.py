@@ -15,66 +15,162 @@ class HTTPType(Enum):
 
 #criar classe para url de request, para reparar host, port, path, hash, e ?
 
+class URL(object):
+	def __init__(self, rawurl):
+		self.protocol=None 	# first part until '://'
+		self.domain=None 	# after '://'
+		self.port=None 		# after ':'
+		self.path=None 		# first string before the last '/'
+		self.resource=None 	# last string after the last '/'
+		self.query=None 	# after '?'
+		self.fragment=None 	# after '#'
+
+		idx=line.find("://")
+		if idx>0:
+			self.protocol=rawurl[:idx].lower()
+			rawurl=rawurl[idx+len("://"):]
+		else
+			self.protocol="http" #default	
+		idx=line.find(":")
+		if idx>0:
+			self.domain=rawurl[:idx].lower()
+			rawurl=rawurl[idx+len(":"):]
+		else
+			self.port=80 #default
+			idx=line.find("/")
+			if idx>0:
+				self.domain=rawurl[:idx].lower() #really the domain?
+				rawurl=rawurl[idx+len("/"):]
+			else
+				self.domain="." #default ?
+
+		hasQuery="?" in rawurl
+		hasFragment="#" in rawurl
+
+		rawurl=rawurl.strip()
+		if hasQuery and hasFragment:
+			idx=line.find("#")
+			if idx>0:
+				self.query=rawurl[idx+1:]
+				rawurl=rawurl[idx+len("#"):]
+			if rawurl[len(rawurl)-1]=='/'
+				rawurl=rawurl[:len(rawurl)-1]
+			idx=line.find("?")
+			if idx>0:
+				self.query=rawurl[idx+1:]
+				rawurl=rawurl[idx+len("?"):]
+			lidx=rawurl.rfind('/')
+			self.path=rawurl[:lidx]
+			self.resource=rawurl[lidx+1:]
+
+		if hasQuery and not hasFragment:
+			idx=line.find("?")
+			if idx>0:
+				self.query=rawurl[idx+1:]
+				rawurl=rawurl[idx+len("?"):]
+			lidx=rawurl.rfind('/')
+			if rawurl[len(rawurl)-1]=='/'
+				rawurl=rawurl[:len(rawurl)-1]
+			lidx=rawurl.rfind('/')
+			self.path=rawurl[:lidx]
+			self.resource=rawurl[lidx+1:]
+
+		if not hasQuery and hasFragment:
+			idx=line.find("#")
+			if idx>0:
+				self.query=rawurl[idx+1:]
+				rawurl=rawurl[idx+len("#"):]
+			if rawurl[len(rawurl)-1]=='/'
+				rawurl=rawurl[:len(rawurl)-1]
+			lidx=rawurl.rfind('/')
+			self.path=rawurl[:lidx]
+			self.resource=rawurl[lidx+1:]
+
+		if not hasQuery and not hasFragment:
+			if rawurl[len(rawurl)-1]=='/'
+				rawurl=rawurl[:len(rawurl)-1]
+			lidx=rawurl.rfind('/')
+			self.path=rawurl[:lidx]
+			self.resource=rawurl[lidx+1:]
 
 class HTTP(object):
-	#atributos
-	#version, type, data, status, contenttype, server, useragent, host, contentlength, accept, acceptlanguage, acceptencoding, connection, date, 
+	def __init__(self, requestdata):
+		self.type=None
+		self.URL=None
+		self.version=None
+		self.data=None
+		self.useragent=None
+		self.contenttype=None
+		self.contentlength=None
+		self.host=None
+		self.accept=None
+		self.acceptlanguage=None
+		self.acceptencoding=None
+		self.connection=None
+		self.status=None
+		self.server=None
 
-
-	def __init__(self, requestdata:str):
 		lines=requestdata.split('\n')
-		rawfields={}
-		httpandversion=False
-		requesttype=False
-		readingdata=False
-
-
-		#simplificar, ler linha por linha na ordem, nao usar dicionario
-		#tem que ler a url de request tambem, usar split(' ') na primeira linha
-		#remover anotações
-
-		for line in lines:
-			if httpandversion==requesttype==False:
-				idxOfHttp=line.find("HTTP")
-				linesize=len(requestdata)
-				if idxOfHttp>0:
-					tmp_version=""
-					for i in xrange(idxOfHttp+len("HTTP"),linesize):
-						currentchar=line[i]
-						if (currentchar>'0' and currentchar<'9') or currentchar=='.' or currentchar==',':
-							tmp_version+=currentchar
-						elif tmp_version!="":
-							break
-					if tmp_version!="":
-						self.version=int(tmp_version)
-						httpandversion=True
-					else:
-						print ("erro") # TODO
-
-					if "GET" in line:
+		nlines=len(lines)
+		httpHeader=False
+		blankSpace=False # https://www.youtube.com/watch?v=e-ORhEE9VVg
+		for i in range(nlines):
+			line=lines[i]
+			if not httpHeader:
+				if "HTTP" in line:
+					method, url, version=line.split(' ')
+					if "GET" in method:
 						self.type=HTTPType.GET
 						requesttype=True
-					elif "POST" in line:
+					elif "POST" in method:
 						self.type=HTTPType.POST
 						requesttype=True
 					else:
 						print ("erro") # TODO
-			elif httpandversion==requesttype==True and not readingdata:
-				if line=="":
-					readingdata=True
+					self.URL=URL(url)
+					self.version=float(version.split('/')[1])
+					httpHeader=True
+
+			elif not blankSpace:
+				if line=="" and self.type==HTTPType.POST:
+					blankSpace=True
+					self.data=""
 				else:
 					idxOfSeparator=line.find(":")
 					if idxOfSeparator>0:
-						rawfields[line[:idxOfSeparator].strip()]=line[(idxOfSeparator+1):].sptrip()
-			elif httpandversion==requesttype==True and readingdata:
+						field=line[:idxOfSeparator].strip()
+						value=line[(idxOfSeparator+1):].sptrip()
+						if field=="User-Agent":
+							self.useragent=value
+						elif field=="Content-Type":
+							self.contenttype=value
+						elif field=="Content-Length":
+							self.contentlength=value
+						elif field=="Host":
+							self.host=value
+						elif field=="Accept":
+							self.accept=value
+						elif field=="Accept-Language":
+							self.acceptlanguage=value
+						elif field=="Accept-Enconding":
+							self.acceptencoding=value
+						elif field=="Connection":
+							self.connection=value
+						else:
+							print ("Unimplemented field: "+field)
+			else:
 				self.data+=line+'\n'
 
-		if len(rawfields)>0: 
-			# TODO, atribuir dados do dicionario às variaveis self
-			print (rawfields)
-			pass
+	def __init__(self, status=StatusCode.OK, contenttype=None, data=None):
+		self.URL=None
+		self.useragent=None
+		self.contentlength=None
+		self.host=None
+		self.accept=None
+		self.acceptlanguage=None
+		self.acceptencoding=None
+		self.connection=None
 
-	def __init__(self, status:StatusCode=StatusCode.OK, contenttype:str=None, data:str=None):
 		self.type=HTTPType.Response
 		self.status=status
 		self.contenttype=contenttype
@@ -82,7 +178,7 @@ class HTTP(object):
 		self.version=1.1
 		self.server="nanoTech Pure HTTP PyServer - "+socket.gethostname()
 
-	def toString() -> str:
+	def toString():
 		# TODO fazer metodo para gerar string do request a partir das variaveis de self disponiveis
 		pass
 
@@ -101,7 +197,7 @@ POST http://localhost:60464/api/student?age=15 HTTP/1.1
 User-Agent: Fiddler
 Host: localhost:60464
 Content-Type: application/json
-Content-Length: 13
+Content-Length: 13lines=reque
 
 {
   id:1,
