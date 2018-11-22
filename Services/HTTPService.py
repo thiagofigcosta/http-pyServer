@@ -37,6 +37,9 @@ class URL(object):
 		if idx>0:
 			self.domain=rawurl[:idx].lower()
 			rawurl=rawurl[idx+len(":"):]
+			idx=rawurl.find("/")
+			self.port=int(rawurl[:idx])
+			rawurl=rawurl[idx+len(":"):]
 		else:
 			self.port=80 #default
 			idx=rawurl.find("/")
@@ -46,21 +49,21 @@ class URL(object):
 			else:
 				self.domain="." #default ?
 
+		# FIX v
 		hasQuery="?" in rawurl
 		hasFragment="#" in rawurl
-
 		rawurl=rawurl.strip()
 		if hasQuery and hasFragment:
 			idx=rawurl.find("#")
 			if idx>0:
 				self.fragment=rawurl[idx+1:]
-				rawurl=rawurl[idx+len("#"):]
+				rawurl=rawurl[:idx+len("#")-1]
 			if rawurl[len(rawurl)-1]=='/':
 				rawurl=rawurl[:len(rawurl)-1]
 			idx=rawurl.find("?")
 			if idx>0:
 				self.query=rawurl[idx+1:]
-				rawurl=rawurl[idx+len("?"):]
+				rawurl=rawurl[:idx+len("?")-1]
 			lidx=rawurl.rfind('/')
 			self.path=rawurl[:lidx]
 			self.resource=rawurl[lidx+1:]
@@ -69,7 +72,7 @@ class URL(object):
 			idx=rawurl.find("?")
 			if idx>0:
 				self.query=rawurl[idx+1:]
-				rawurl=rawurl[idx+len("?"):]
+				rawurl=rawurl[:idx+len("?")-1]
 			lidx=rawurl.rfind('/')
 			if rawurl[len(rawurl)-1]=='/':
 				rawurl=rawurl[:len(rawurl)-1]
@@ -81,7 +84,7 @@ class URL(object):
 			idx=rawurl.find("#")
 			if idx>0:
 				self.query=rawurl[idx+1:]
-				rawurl=rawurl[idx+len("#"):]
+				rawurl=rawurl[:idx+len("#")-1]
 			if rawurl[len(rawurl)-1]=='/':
 				rawurl=rawurl[:len(rawurl)-1]
 			lidx=rawurl.rfind('/')
@@ -196,7 +199,7 @@ class HTTP(object):
 		return json.loads(json, object_hook=lambda d: HTTP(**d))
 
 
-
+url=URL("http://localhost:60464/api/student?age=15")
 http=HTTP("""
 POST http://localhost:60464/api/student?age=15 HTTP/1.1
 User-Agent: Fiddler
