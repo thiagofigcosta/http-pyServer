@@ -49,15 +49,15 @@ class BackendServer(object):
 	LOGFILENAME="logs/backend_"+str(int(time.time()))+".log"
 	def __init__(self):
 		self.running=False
-		self.CLIENTS = []    			# list of socket clients
-		self.RECV_BUFFER = 32768 		# Advisable to keep it as an exponent of 2
-		self.THREADS = []
-		self.SERVER = "127.0.0.1" 		
-		# self.SERVER = "31.220.54.249" 		
-		self.PORT = 5000
-		self.GMAIL_EMAIL = "nyxapp@gmail.com"
-		self.GMAIL_PASS = "type it"
-		self.CONNECTION_TIMEOUT=60 #60s to avoid unnecessary processing
+		self.CLIENTS=[]    			# list of socket clients
+		self.RECV_BUFFER=32768 		# Advisable to keep it as an exponent of 2
+		self.THREADS=[]
+		self.SERVER="127.0.0.1" 		
+		# self.SERVER="31.220.54.249" 		
+		self.PORT=3000
+		self.GMAIL_EMAIL="nyxapp@gmail.com"
+		self.GMAIL_PASS="type it"
+		self.CONNECTION_TIMEOUT=60 	#60s to avoid unnecessary processing
 		self.INACTIVE_ACCOUNT_VALIDITY=48*60*60
 		self.RECEIVE_TIMEOUT=0.2
 		self.time_timeout=time.time()
@@ -191,32 +191,6 @@ class BackendServer(object):
 				except:
 					pass
 			return ''.join(total_data)
-
-	@staticmethod
-	def log(message,error=False,traceback=False,printonscreen=True):
-		now = datetime.datetime.now()
-		nowstr=now.strftime("%Y%m%d-%H:%M:%S.")+'{:06d}'.format(now.microsecond)
-		info_header="["+socket.gethostname()+"|"+nowstr+"] "
-		fail_delimiter="***********************************************"
-		error_header  ="*--------------------ERROR--------------------*"
-		traceb_header ="*------------------TRACE_BACK------------------"
-		formatted_message =""
-		if error or traceback:
-			formatted_message=info_header+'\n'+fail_delimiter+'\n'
-			if error:
-				formatted_message+=error_header+'\n'
-			if traceback:
-				formatted_message+=traceb_header+'\n'
-			formatted_message+=fail_delimiter+'\n'
-			formatted_message+=message+'\n'
-			formatted_message+=fail_delimiter
-		else:
-			formatted_message=info_header+message
-		if printonscreen:
-			print (formatted_message)
-		formatted_message+='\n'
-		with open(BackendServer.LOGFILENAME, "a") as logfile:
-			logfile.write(formatted_message)
 
 	def interruptSignal(self,signal, frame):
 		self.shutdown()
