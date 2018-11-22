@@ -13,8 +13,6 @@ class HTTPType(Enum):
 	GET=91603
 	POST=514320
 
-#criar classe para url de request, para reparar host, port, path, hash, e ?
-
 class URL(object):
 	def __init__(self, rawurl):
 		self.protocol=None 	# first part until '://'
