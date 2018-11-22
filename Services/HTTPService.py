@@ -49,7 +49,6 @@ class URL(object):
 			else:
 				self.domain="." #default ?
 
-		# FIX v
 		hasQuery="?" in rawurl
 		hasFragment="#" in rawurl
 		rawurl=rawurl.strip()
