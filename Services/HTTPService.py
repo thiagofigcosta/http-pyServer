@@ -25,6 +25,8 @@ class URL(object):
 		self.query=None 	# after '?'
 		self.fragment=None 	# after '#'
 
+		# Decode url hex chars %FF
+
 		idx=line.find("://")
 		if idx>0:
 			self.protocol=rawurl[:idx].lower()
