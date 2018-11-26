@@ -279,18 +279,3 @@ class HTTP(object):
 	@staticmethod
 	def fromJson(json):
 		return json.loads(json, object_hook=lambda d: HTTP(**d))
-
-
-url=URL("http://localhost:60464/api/student?age=15")
-http=HTTP("""
-POST http://localhost:60464/api/student?age=15 HTTP/1.1
-User-Agent: Fiddler
-Host: localhost:60464
-Content-Type: application/json
-Content-Length: 13lines=reque
-
-{
-  id:1,
-  name:'Steve'
-}
-""")
