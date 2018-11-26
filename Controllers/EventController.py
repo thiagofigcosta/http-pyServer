@@ -31,7 +31,7 @@ class EventController(Controller):
 	def register(self,request):
 		event=RegisterEventRequest.fromJson(request.data)
 		if self.sql.checkIfNCExists(event.owner_id):
-
+			pass
 		else:
 			error=Error(str(404),{"pointer": request.url.path+'/'+request.url.resource},"Not found","Account not found on databse.")
 			return HTTP(status=StatusCode.C404,data=Error.listToJson([error]),contenttype="application/json")

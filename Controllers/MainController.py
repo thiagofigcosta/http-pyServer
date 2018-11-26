@@ -8,6 +8,7 @@ sys.path.insert(0, '../Services')
 
 from Error import Error
 from HTTPService import HTTP
+from HTTPService import HTTPType
 from HTTPService import StatusCode
 from FeedbackRequest import FeedbackRequest
 

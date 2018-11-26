@@ -72,7 +72,7 @@ class SQLService(object):
 		nightclub=self.query.fetchone()
 		self.query.execute("SELECT id,zipcode,street,number,xtrainfo,district,city,state,country FROM addresses WHERE id="+str(nightclub[5])+";")
 		addr=self.query.fetchone()
-		return Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],Address(addr[0],addr[1],addr[2],addr[3],addr[4],addr[5],addr[6],addr[7],addr[8])))
+		return Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],Address(addr[0],addr[1],addr[2],addr[3],addr[4],addr[5],addr[6],addr[7],addr[8]))
 
 	def getNightclubs(self):
 		self.query.execute("SELECT id, name, cnpj, phone, email, id_address FROM nightclubs;")
