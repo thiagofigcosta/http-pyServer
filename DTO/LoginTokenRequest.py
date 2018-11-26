@@ -3,10 +3,9 @@
 
 import json
 
-class LoginRequest(object):
-	def __init__(self, email, password, uuid, timestamp):
+class LoginTokenRequest(object):
+	def __init__(self, email, uuid, timestamp):
 		self.email=email.strip()
-		self.password=password.strip()
 		self.uuid=uuid.strip()
 		self.timestamp=timestamp
 
@@ -16,4 +15,4 @@ class LoginRequest(object):
 
 	@staticmethod
 	def fromJson(jsonstr):
-		return json.loads(jsonstr, object_hook=lambda d: LoginRequest(**d))
+		return json.loads(jsonstr, object_hook=lambda d: LoginTokenRequest(**d))

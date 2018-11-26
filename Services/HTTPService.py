@@ -171,6 +171,7 @@ class HTTP(object):
 			self.connection=None
 			self.status=None
 			self.server=None
+			self.client=None
 
 			lines=requestdata.split('\n')
 			nlines=len(lines)
@@ -336,6 +337,8 @@ class HTTP(object):
 		print (self.status)
 		sys.stdout.write('server: ')
 		print (self.server)
+		sys.stdout.write('client: ')
+		print (self.client)
 
 	@staticmethod
 	def toJson(http):

@@ -41,8 +41,7 @@ class HttpBackendServer(object):
 		self.PORT=port
 		self.INACTIVE_ACCOUNT_VALIDITY=48*60*60 # in seconds
 		self.RECEIVE_TIMEOUT=0.2
-		self.time_removeacc=time.time() # TODO create class for events
-		self.CONSTANTHASHSTR="Now I am become Death, the destroyer of worlds."
+		self.time_removeacc=time.time() # TODO create class for events	
 
 	def loop(self):
 		try:
@@ -216,12 +215,14 @@ class HttpBackendServer(object):
 
 	def setupControllers(self):
 		self.logger.log("Setting Up controllers...")
-		self.mainCtrl=MainController(self.sql,"api")
-		self.mainCtrl.appendController(AccountController(self.sql,"acc"))
+		self.mainCtrl=MainController(self,"api")
+		self.mainCtrl.appendController(AccountController(self,"acc"))
 
 	def requestHandler(self,sock,data):
 		try:
 			request=HTTP(data)
+			request.client=sock.TSname
+			# TODO check host and other info
 			request.debug()
 			self.logger.log("request ["+request.type.name+" - "+request.url.path+'/'+request.url.resource+"] received from "+sock.TSname)
 			try:
@@ -239,7 +240,7 @@ class HttpBackendServer(object):
 			response=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
 			responsestr=response.toString()
 			self.Send(sock,responsestr)
-		try:#TODO check connection type before
+		try:# TODO check connection type before close-it
 			sock.close()
 			self.CLIENTS.remove(sock)
 		except Exception as e:

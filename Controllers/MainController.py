@@ -18,9 +18,10 @@ class Resource(object):
 		
 
 class Controller(object):
-	def __init__(self, sql, path):
+	def __init__(self, server, path):
 		self.path=path
-		self.sql=sql
+		self.sql=server.sql
+		self.email=server.email
 		self.resources=[] # children must check resources list to handle requests
 
 	def handle(self,request):
@@ -28,8 +29,8 @@ class Controller(object):
 
 
 class MainController(Controller):
-	def __init__(self, sql, path):
-		super(MainController, self).__init__(sql,path)
+	def __init__(self, server, path):
+		super(MainController, self).__init__(server,path)
 		self.controllers=[]
 		self.controllers.append(self)
 
@@ -44,4 +45,5 @@ class MainController(Controller):
 		return HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
 
 	def handle(self,request):
-		pass
+		error=Error(str(404),{"pointer": request.url.path+'/'+request.url.resource},"Not found","Resource not implemented on backend.")
+		return HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
