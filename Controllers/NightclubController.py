@@ -31,7 +31,7 @@ class NightclubController(Controller):
 	def register(self,request):
 		night=RegisterNCRequest.fromJson(request.data)
 		if self.sql.checkIfAccountExists(id=night.owner_id):
-			if not self.sql.checkIfNCExists(night.cnpj):
+			if not self.sql.checkIfNCExistsByCnpj(night.cnpj):
 				addr_id=self.sql.getAddressId(night.zipcode, night.street, night.number, night.xtrainfo, night.district, night.city, night.state, night.country)
 				if addr_id==None:
 					self.sql.createAddress(night.zipcode, night.street, night.number, night.xtrainfo, night.district, night.city, night.state, night.country)

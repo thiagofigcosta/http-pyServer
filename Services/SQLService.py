@@ -148,8 +148,12 @@ class SQLService(object):
 		else:
 			return True #TODO ERROR
 
-	def checkIfNCExists(self,cnpj):
+	def checkIfNCExistsByCnpj(self,cnpj):
 		self.query.execute("SELECT COUNT(*) FROM nightclubs WHERE cnpj='"+cnpj+"';")
+		return self.query.fetchone()[0]!=0
+
+	def checkIfNCExists(self,id):
+		self.query.execute("SELECT COUNT(*) FROM nightclubs WHERE id="+str(id)+";")
 		return self.query.fetchone()[0]!=0
 
 	def getAddressId(self,zipcode, street, number, xtrainfo, district, city, state, country):

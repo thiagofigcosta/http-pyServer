@@ -23,6 +23,8 @@ from Error import Error
 from log import Logger
 from MainController import MainController
 from AccountController import AccountController
+from NightclubController import NightclubController
+from EventController import EventController
 from EmailService import EmailService
 from HTTPService import StatusCode
 from HTTPService import HTTP
@@ -217,6 +219,8 @@ class HttpBackendServer(object):
 		self.logger.log("Setting Up controllers...")
 		self.mainCtrl=MainController(self,"api")
 		self.mainCtrl.appendController(AccountController(self,"acc"))
+		self.mainCtrl.appendController(NightclubController(self,"nclub"))
+		self.mainCtrl.appendController(EventController(self,"nclub/event"))
 
 	def requestHandler(self,sock,data):
 		try:
