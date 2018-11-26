@@ -12,8 +12,8 @@ class RegisterAccRequest(object):
 		self.password=password.strip()
 
 	@staticmethod
-	def toJson(register):
-		return json.dumps(register.__dict__)
+	def toJson(obj):
+		return json.dumps(obj.__dict__)
 
 	@staticmethod
 	def fromJson(jsonstr):

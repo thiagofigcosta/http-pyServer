@@ -11,8 +11,8 @@ class Error(object):
 		self.detail=detail
 
 	@staticmethod
-	def toJson(error):
-		return json.dumps(error.__dict__)
+	def toJson(obj):
+		return json.dumps(obj.__dict__)
 
 	@staticmethod
 	def fromJson(jsonstr):

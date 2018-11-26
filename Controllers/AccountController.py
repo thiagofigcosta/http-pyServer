@@ -114,7 +114,7 @@ class AccountController(Controller):
 		token=RGenerator.genToken()
 		self.sql.updateAccountToken(email=email,token=token)
 		self.email.SendConfirmationMail(email,token)
-		return HTTP(status=StatusCode.OK,data="Token resended.",contenttype="text/plain")
+		return HTTP(status=StatusCode.OK,data="Token resented.",contenttype="text/plain")
 
 	def checkToken(self,request):
 		cktoken=CheckTokenRequest.fromJson(request.data)
