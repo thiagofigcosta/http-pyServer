@@ -1,23 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import select
+# Python imports
 import time
-import SQLHandler
-import pbkdf2
-import RGenerator
-import traceback
-import getpass
 import sys
-import signal
 import os
-import smtplib
-import datetime
+import signal
+import socket
+import select
+import traceback
 import threading
 from cStringIO import StringIO
 
+# Folder inclusions
+sys.path.insert(0, 'Controllers')
+sys.path.insert(0, 'DTO')
+sys.path.insert(0, 'Services')
+sys.path.insert(0, 'Utils')
 
+# Custom imports
+from Error import Error
+from log import Logger
+from MainController import MainController
+from AccountController import AccountController
+from EmailService import EmailService
+from HTTPService import StatusCode
+from HTTPService import HTTP
+from SQLService import SQLService
+from TSocket import TSocket
 
+# Code
 class HttpBackendServer(object):
 	def __init__(self,IP="127.0.0.1",port=3000):
 		self.logger=Logger("logs/backend_"+str(int(time.time()))+".log")
@@ -32,7 +44,6 @@ class HttpBackendServer(object):
 		self.time_removeacc=time.time() # TODO create class for events
 		self.CONSTANTHASHSTR="Now I am become Death, the destroyer of worlds."
 		self.SENDMAIL=True
-		self.mainCrtl=None
 
 	def loop(self):
 		try:
@@ -43,7 +54,7 @@ class HttpBackendServer(object):
 					sockfd=TSocket(sockfd)
 					sockfd.settimeout(self.RECEIVE_TIMEOUT) 
 					self.CLIENTS.append(sockfd)
-					logger.log("Client ("+sockfd.TSname+") connected!")
+					self.logger.log("Client ("+sockfd.TSname+") connected!")
 					threading.Thread(target=self.listen,args=(sockfd,)).start()
 		except Exception as e:
 			self.handleException(e)
@@ -53,10 +64,10 @@ class HttpBackendServer(object):
 		while self.running and sock.TSrunning:
 			try: #received data
 				request=self.recv_timeout(sock,self.RECEIVE_TIMEOUT).strip() # safer than # data = sock.recv(self.RECV_BUFFER)
-				requestHandler(request)
+				self.requestHandler(sock,request)
 			except Exception as e: #client disconnected
 				self.handleException(e)
-				logger.log("Client ("+sock.TSname+") disconnected!")
+				self.logger.log("Client ("+sock.TSname+") disconnected!")
 				sock.close()
 				self.CLIENTS.remove(sock)
 		try:
@@ -70,16 +81,16 @@ class HttpBackendServer(object):
 			delta_removeacc=current_time-self.time_removeacc
 
 			if delta_removeacc>=self.INACTIVE_ACCOUNT_VALIDITY:
-				try:setupControllers
+				try:
 					result=self.sql.removeInactiveAccounts(self.INACTIVE_ACCOUNT_VALIDITY)
-					logger.log(str(result)+" accounts removed!")
+					self.logger.log(str(result)+" accounts removed!")
 				except Exception as e:
 					self.handleException(e)
 				self.time_removeacc=time.time()
 
 
 	def shutdown(self):
-		logger.log("Shuting down server...")
+		self.logger.log("Shuting down server...")
 		self.running=False
 		self.THREADS=[]
 		for sock in self.CLIENTS:
@@ -87,20 +98,20 @@ class HttpBackendServer(object):
 				sock.close()
 		self.server_socket.close()
 		self.CLIENTS = []
-		logger.log("Bye <3")
+		self.logger.log("Bye <3")
 		if self.SENDMAIL:
 			try:
 				self.SendMail(self.GMAIL_EMAIL,"Servidor encerrado","Server endded\n"+"["+socket.gethostname()+" - "+str(int(round(time.time())))+"]",files=[logger.filename])
 			except Exception as e:
-				logger.log("Failed to send server end notification email",error=True)
+				self.logger.log("Failed to send server end notification email",error=True)
 				self.handleException(e)
 		sys.exit(0)
 
 
-	def broadcast_data (self, sock, packet):	
+	def broadcast_data (self, sock, data):	
 		for socket in CLIENTS:
 			if socket != server_socket and socket != sock:
-				self.Send(sock,packet)
+				self.Send(sock,data)
 
 	def recv_timeout(self,the_socket,timeout=2):
 		if timeout==0:
@@ -130,11 +141,11 @@ class HttpBackendServer(object):
 		self.shutdown()
 
 	def start(self):
-		logger.log("Starting server...")
+		self.logger.log("Starting server...")
 		self.running=True
 		signal.signal(signal.SIGINT, self.interruptSignal)
-		self.sql=SQLHandler()
-		logger.log("Conntecing to database...")
+		self.sql=SQLService()
+		self.logger.log("Conntecing to database...")
 		self.sql.connect()
 		self.config()
 		self.run()
@@ -146,9 +157,9 @@ class HttpBackendServer(object):
 				emailpass=emailpassfile.read().replace('\n', '')
 		except:
 			pass
-		self.configEmail(True,emailpass)
+		self.email=EmailService(self,"nyxapp@gmail.com",emailpass)
 		self.setupControllers()
-		logger.log("Configuring server...")
+		self.logger.log("Configuring server...")
 		self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.server_socket.bind((self.SERVER, self.PORT))
@@ -186,51 +197,50 @@ class HttpBackendServer(object):
 		exceptionstr+=repr(traceback.format_tb(exc_traceback))+"\n"
 		exceptionstr+="*** tb_lineno:\n"
 		exceptionstr+=str(exc_traceback.tb_lineno)
-		logger.log(exceptionstr,traceback=True)
+		self.logger.log(exceptionstr,traceback=True)
 		return exceptionstr
 
 	def startThreads(self):
-		logger.log("Starting threads...")
+		self.logger.log("Starting threads...")
 		t=threading.Thread(target=self.processEvents)
 		self.THREADS.append(t)
 		t.start()
 
 	def run(self):
 		self.startThreads()
-		logger.log("Server started on "+self.SERVER+":"+str(self.PORT)+"!!!")
+		self.logger.log("Server started on "+self.SERVER+":"+str(self.PORT)+"!!!")
 		while self.running:
 			self.loop()
 		self.shutdown()
 
 	def Send(self,sock,data):
-		packet.crypt()
-		data=Packet.ToByteArray(packet)
 		sock.send(data)
 
 	def setupControllers(self):
-		logger.log("Setting Up controllers...")
-		self.mainCrtl=MainController("data/")
+		self.logger.log("Setting Up controllers...")
+		self.mainCtrl=MainController(self.sql,"api")
+		self.mainCtrl.appendController(AccountController(self.sql,"login"))
 
 	def requestHandler(self,sock,data):
 		try:
 			request=HTTP(data)
-			logger.log("request ["+request.type.name+" - "+request.url.path+request.url.resource+"] received from "+sock.TSname)
+			self.logger.log("request ["+request.type.name+" - "+request.url.path+request.url.resource+"] received from "+sock.TSname)
 			try:
-				response=self.mainCrtl.routeRequests()
+				response=self.mainCtrl.routeRequests()
 				self.Send(sock,response.toString())
 			except Exception as e:
 				errorstr=self.handleException(e)
 				error=Error(str(500),{"pointer": errorstr},"Internal Server Error","Error processing request.")
-				reponse=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
+				response=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
 				self.Send(sock,response.toString())
 		except Exception as e:
 			errorstr=self.handleException(e)
 			error=Error(str(500),{"pointer": errorstr},"Internal Server Error","Error translating request.")
-			reponse=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
+			response=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
 			self.Send(sock,response.toString())
 
 
 if __name__ == "__main__":
-	server = HttpBackendServer()
+	server = HttpBackendServer("172.16.253.189")
 	server.start()
 

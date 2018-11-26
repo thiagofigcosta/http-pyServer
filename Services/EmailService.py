@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import smtplib
+import getpass
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -10,32 +12,33 @@ from email.generator import Generator
 
 class EmailService(object):
 
-	def __init__(self,email,password,sendmail):
-		self.GMAIL_EMAIL="nyxapp@gmail.com"
-		self.GMAIL_PASS="type it"
-
-	def configEmail(self,sendNotification,password=None):
+	def __init__(self,server,email,password=None,sendmail=True,sendNotification=True):
+		self.GMAIL_EMAIL=email
+		self.GMAIL_PASS=password
+		self.SENDMAIL=sendmail
+		self.SENDNOTIFICATION=sendNotification
+		self.server=server
 		if not self.SENDMAIL:
-			BackendServer.log("Ignoring email...")
+			self.server.logger.log("Ignoring email...")
 		else:
-			BackendServer.log("Configuring email...")
+			self.server.logger.log("Configuring email...")
 			if password==None:
-			try:
-				with open('emailpassword.txt', 'r') as emailpassfile:
-					password=emailpassfile.read().replace('\n', '')
-			except:
-					passasker="Digite a senha do email "+self.GMAIL_EMAIL+":"
-					print (passasker) #no need to print on log
-					self.GMAIL_PASS=getpass.getpass()
+				try:
+					with open('emailpassword.txt', 'r') as emailpassfile:
+						password=emailpassfile.read().replace('\n', '')
+				except:
+						passasker="Digite a senha do email "+self.GMAIL_EMAIL+":"
+						print (passasker) #no need to print on log
+						self.GMAIL_PASS=getpass.getpass()
 			else:
 				self.GMAIL_PASS=password
-			if sendNotification:
+			if self.SENDNOTIFICATION:
 				try:
 					self.SendMail(self.GMAIL_EMAIL,"Servidor iniciado","Server started\n"+"["+socket.gethostname()+" - "+str(int(round(time.time())))+"]")
 				except Exception as e:
-					BackendServer.log("Failed to send server start notification email",error=True)
+					self.server.logger.log("Failed to send server start notification email",error=True)
 					self.SENDMAIL=False
-					self.handleException(e)
+					self.server.handleException(e)
 
 	def SendMail(self,destination,subject,text,destination_name=None,html='',files=None,sender=None): # check https://www.google.com/settings/security/lesssecureapps
 		if self.SENDMAIL:
@@ -75,7 +78,7 @@ class EmailService(object):
 			g.flatten(msg)
 			server_ssl.sendmail(self.GMAIL_EMAIL, destination, str_io.getvalue())
 			server_ssl.close()#server_ssl.quit()
-			BackendServer.log("Email sent to '"+destination+"' about '"+subject+"'")
+			self.server.logger.log("Email sent to '"+destination+"' about '"+subject+"'")
 
 	def SendConfirmationMail(self,destination,token):
 		self.SendMail(destination,"[NYX] Ative sua conta!","Seu código é: "+token)

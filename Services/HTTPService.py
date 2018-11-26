@@ -5,6 +5,67 @@ import socket
 import json
 from datetime import datetime
 
+
+
+
+class HiddenStatusCode(object):
+	def __init__(self, code, name):
+		self.code=code
+		self.name=name
+
+class StatusCode(object):
+	C100=CONTINUE=HiddenStatusCode(100,'Continue')
+	C101=SWITCHING=HiddenStatusCode(101,'Switching Protocols')
+	C200=OK=HiddenStatusCode(200,'OK')
+	C201=CREATED=HiddenStatusCode(201,'Created')
+	C202=ACCEPTED=HiddenStatusCode(202,'Accepted')
+	C203=NAUTHINFO=HiddenStatusCode(203,'Non-Authoritative Information')
+	C204=NCONTENT=HiddenStatusCode(204,'No Content')
+	C205=RCONTENT=HiddenStatusCode(205,'Reset Content')
+	C206=PCONTENT=HiddenStatusCode(206,'Partial Content')
+	C300=MULTICHOICES=HiddenStatusCode(300,'Multiple Choices')
+	C301=MOVED4EVER=HiddenStatusCode(301,'Moved Permanently')
+	C302=FOUND=HiddenStatusCode(302,'Found')
+	C303=SEEOTHER=HiddenStatusCode(303,'See Other')
+	C304=NMODIFIED=HiddenStatusCode(304,'Not Modified')
+	C305=USEPROXY=HiddenStatusCode(305,'Use Proxy')
+	C307=TMPREDIRECTED=HiddenStatusCode(307,'Temporary Redirect')
+	C400=BADREQ=HiddenStatusCode(400,'Bad Request')
+	C401=UNAUTHORIZED=HiddenStatusCode(401,'Unauthorized')
+	C402=PAYMENTREQ=HiddenStatusCode(402,'Payment Required')
+	C403=FORBIDDEN=HiddenStatusCode(403,'Forbidden')
+	C404=NOTFOUND=HiddenStatusCode(404,'Not Found')
+	C405=METHODNALLOWED=HiddenStatusCode(405,'Method Not Allowed')
+	C406=NACCEPTABLE=HiddenStatusCode(406,'Not Acceptable')
+	C407=PROXYAUTHREQ=HiddenStatusCode(407,'Proxy Authentication Required')
+	C408=REQTIMEOUT=HiddenStatusCode(408,'Request Time-out')
+	C409=CONFLICT=HiddenStatusCode(409,'Conflict')
+	C410=GONE=HiddenStatusCode(410,'Gone')
+	C411=LENGTHREQ=HiddenStatusCode(411,'Length Required')
+	C412=PRECONDFAILED=HiddenStatusCode(412,'Precondition Failed')
+	C413=REQENTTOOBIG=HiddenStatusCode(413,'Request Entity Too Large')
+	C414=REQURITOOBIG=HiddenStatusCode(414,'Request-URI Too Large')
+	C415=UNSUPMEDIATYPE=HiddenStatusCode(415,'Unsupported Media Type')
+	C416=REQRANGENOTSATS=HiddenStatusCode(416,'Requested range not satisfiable')
+	C417=EXPECTATIONFAILED=HiddenStatusCode(417,'Expectation Failed')
+	C500=INTERNALSERVERERR=HiddenStatusCode(500,'Internal Server Error')
+	C501=NOTIMPLEMENTED=HiddenStatusCode(501,'Not Implemented')
+	C502=BADGATEWAY=HiddenStatusCode(502,'Bad Gateway')
+	C503=SERVICEUNAVAIL=HiddenStatusCode(503,'Service Unavailable')
+	C504=GATEWAYTIMEOUT=HiddenStatusCode(504,'Gateway Time-out')
+	C505=HTTPVERNSUPP=HiddenStatusCode(505,'HTTP Version not supported')
+
+class HiddenHTTPType(object):
+	def __init__(self, code, name):
+		self.code=code
+		self.name=name
+
+class HTTPType(object):
+	Response=HiddenHTTPType(64313,'Response')
+	GET=HiddenHTTPType(91603,'GET')
+	POST=HiddenHTTPType(514320,'POST')
+"""
+
 class StatusCode(object):
 	def __init__(self, code, name):
 		self.code=code
@@ -59,6 +120,8 @@ class HTTPType(object):
 	Response=HTTPType(64313,'Response')
 	GET=HTTPType(91603,'GET')
 	POST=HTTPType(514320,'POST')
+
+	"""
 
 class URL(object):
 	def __init__(self, rawurl):
