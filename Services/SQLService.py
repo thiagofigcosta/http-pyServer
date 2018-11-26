@@ -67,12 +67,21 @@ class SQLService(object):
 		else:
 			return {"hash":result[0], "salt":result[1],"logintoken":result[2] ,"id":result[3]}
 
+	def getNightclub(self,cnpj):
+		self.query.execute("SELECT id, name, cnpj, phone, email, id_address FROM nightclubs WHERE cnpj='"+cnpj+"';")
+		nightclub=self.query.fetchone()
+		self.query.execute("SELECT id,zipcode,street,number,xtrainfo,district,city,state,country FROM addresses WHERE id="+str(nightclub[5])+";")
+		addr=self.query.fetchone()
+		return Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],Address(addr[0],addr[1],addr[2],addr[3],addr[4],addr[5],addr[6],addr[7],addr[8])))
+
 	def getNightclubs(self):
-		self.query.execute("SELECT id, name, cnpj, phone, email, address FROM nightclubs;")
+		self.query.execute("SELECT id, name, cnpj, phone, email, id_address FROM nightclubs;")
 		result = list(self.query)
 		nightclubs=[]
 		for nightclub in result:
-			nightclubs.append(Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],nightclub[5]))
+			self.query.execute("SELECT id,zipcode,street,number,xtrainfo,district,city,state,country FROM addresses WHERE id="+str(nightclub[5])+";")
+			addr=self.query.fetchone()
+			nightclubs.append(Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],Address(addr[0],addr[1],addr[2],addr[3],addr[4],addr[5],addr[6],addr[7],addr[8])))
 		return Nightclub.listToJson(nightclubs)
 
 	def getNightclubs(self, id_account):
@@ -80,7 +89,9 @@ class SQLService(object):
 		result = list(self.query)
 		nightclubs=[]
 		for nightclub in result:
-			nightclubs.append(Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],nightclub[5]))
+			self.query.execute("SELECT id,zipcode,street,number,xtrainfo,district,city,state,country FROM addresses WHERE id="+str(nightclub[5])+";")
+			addr=self.query.fetchone()
+			nightclubs.append(Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],Address(addr[0],addr[1],addr[2],addr[3],addr[4],addr[5],addr[6],addr[7],addr[8])))
 		return Nightclub.listToJson(nightclubs)
 
 	def getEvents(self):
@@ -136,6 +147,14 @@ class SQLService(object):
 			return self.query.fetchone()[0]!=0
 		else:
 			return True #TODO ERROR
+
+	def checkIfNCExists(self,cnpj):
+		self.query.execute("SELECT COUNT(*) FROM nightclubs WHERE cnpj='"+cnpj+"';")
+		return self.query.fetchone()[0]!=0
+
+	def getAddressId(self,zipcode, street, number, xtrainfo, district, city, state, country):
+		self.query.execute("SELECT id FROM addresses WHERE zipcode="+str(zipcode)+",street='"+street+"',number="+str(number)+",xtrainfo='"+xtrainfo+"',district='"+district+"',city='"+city+"',state='"+state+"',country='"+country+"' LIMIT 1;")
+		return self.query.fetchone()[0]
 
 	def updateAccountToken(self,email=None,id=None,token="NOPS"):
 		if (email==None and id!=None):
