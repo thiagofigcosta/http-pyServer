@@ -18,8 +18,8 @@ class Nigthclub(object):
 		return json.dumps(nigthclub.__dict__)
 
 	@staticmethod
-	def fromJson(json):
-		return json.loads(json, object_hook=lambda d: Nigthclub(**d))
+	def fromJson(jsonstr):
+		return json.loads(jsonstr, object_hook=lambda d: Nigthclub(**d))
 
 	@staticmethod
 	def listToJson(nigthclubs):

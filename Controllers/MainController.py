@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+
+sys.path.insert(0, '../DTO')
+sys.path.insert(0, '../Services')
+
+from Error import Error
+from HTTPService import HTTP
+from HTTPService import StatusCode
+
+
 class Resource(object):
 	def __init__(self, name, type):
 		self.name=name

@@ -26,8 +26,8 @@ class Account(object):
 			return json.dumps(account.__dict__)
 
 	@staticmethod
-	def fromJson(json):
-		return json.loads(json, object_hook=lambda d: Account(**d))
+	def fromJson(jsonstr):
+		return json.loads(jsonstr, object_hook=lambda d: Account(**d))
 
 	@staticmethod
 	def listToJson(accounts):

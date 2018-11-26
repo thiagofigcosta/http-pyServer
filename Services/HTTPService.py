@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import socket
 import json
 from datetime import datetime
@@ -64,64 +65,6 @@ class HTTPType(object):
 	Response=HiddenHTTPType(64313,'Response')
 	GET=HiddenHTTPType(91603,'GET')
 	POST=HiddenHTTPType(514320,'POST')
-"""
-
-class StatusCode(object):
-	def __init__(self, code, name):
-		self.code=code
-		self.name=name
-
-	C100=CONTINUE=StatusCode(100,'Continue')
-	C101=SWITCHING=StatusCode(101,'Switching Protocols')
-	C200=OK=StatusCode(200,'OK')
-	C201=CREATED=StatusCode(201,'Created')
-	C202=ACCEPTED=StatusCode(202,'Accepted')
-	C203=NAUTHINFO=StatusCode(203,'Non-Authoritative Information')
-	C204=NCONTENT=StatusCode(204,'No Content')
-	C205=RCONTENT=StatusCode(205,'Reset Content')
-	C206=PCONTENT=StatusCode(206,'Partial Content')
-	C300=MULTICHOICES=StatusCode(300,'Multiple Choices')
-	C301=MOVED4EVER=StatusCode(301,'Moved Permanently')
-	C302=FOUND=StatusCode(302,'Found')
-	C303=SEEOTHER=StatusCode(303,'See Other')
-	C304=NMODIFIED=StatusCode(304,'Not Modified')
-	C305=USEPROXY=StatusCode(305,'Use Proxy')
-	C307=TMPREDIRECTED=StatusCode(307,'Temporary Redirect')
-	C400=BADREQ=StatusCode(400,'Bad Request')
-	C401=UNAUTHORIZED=StatusCode(401,'Unauthorized')
-	C402=PAYMENTREQ=StatusCode(402,'Payment Required')
-	C403=FORBIDDEN=StatusCode(403,'Forbidden')
-	C404=NOTFOUND=StatusCode(404,'Not Found')
-	C405=METHODNALLOWED=StatusCode(405,'Method Not Allowed')
-	C406=NACCEPTABLE=StatusCode(406,'Not Acceptable')
-	C407=PROXYAUTHREQ=StatusCode(407,'Proxy Authentication Required')
-	C408=REQTIMEOUT=StatusCode(408,'Request Time-out')
-	C409=CONFLICT=StatusCode(409,'Conflict')
-	C410=GONE=StatusCode(410,'Gone')
-	C411=LENGTHREQ=StatusCode(411,'Length Required')
-	C412=PRECONDFAILED=StatusCode(412,'Precondition Failed')
-	C413=REQENTTOOBIG=StatusCode(413,'Request Entity Too Large')
-	C414=REQURITOOBIG=StatusCode(414,'Request-URI Too Large')
-	C415=UNSUPMEDIATYPE=StatusCode(415,'Unsupported Media Type')
-	C416=REQRANGENOTSATS=StatusCode(416,'Requested range not satisfiable')
-	C417=EXPECTATIONFAILED=StatusCode(417,'Expectation Failed')
-	C500=INTERNALSERVERERR=StatusCode(500,'Internal Server Error')
-	C501=NOTIMPLEMENTED=StatusCode(501,'Not Implemented')
-	C502=BADGATEWAY=StatusCode(502,'Bad Gateway')
-	C503=SERVICEUNAVAIL=StatusCode(503,'Service Unavailable')
-	C504=GATEWAYTIMEOUT=StatusCode(504,'Gateway Time-out')
-	C505=HTTPVERNSUPP=StatusCode(505,'HTTP Version not supported')
-
-class HTTPType(object):
-	def __init__(self, code, name):
-		self.code=code
-		self.name=name
-
-	Response=HTTPType(64313,'Response')
-	GET=HTTPType(91603,'GET')
-	POST=HTTPType(514320,'POST')
-
-	"""
 
 class URL(object):
 	def __init__(self, rawurl):
@@ -206,6 +149,11 @@ class URL(object):
 			self.path=rawurl[:lidx]
 			self.resource=rawurl[lidx+1:]
 
+		if self.path:
+			self.path=self.path.strip()
+			if self.path[0]=='/':
+				self.path=self.path[1:]
+
 class HTTP(object):
 	def __init__(self, requestdata=None, status=None, data=None, contenttype=None):
 		if requestdata and not status and not data and not contenttype:
@@ -240,13 +188,13 @@ class HTTP(object):
 							self.type=HTTPType.POST
 							requesttype=True
 						else:
-							print ("erro") # TODO
+							self.type=None # TODO erro
 						self.url=URL(url)
 						self.version=float(version.split('/')[1])
 						httpHeader=True
 
 				elif not blankSpace:
-					if line=="" and self.type==HTTPType.POST:
+					if (line.strip()=="" or not line) and self.type==HTTPType.POST:
 						blankSpace=True
 						self.data=""
 					else:
@@ -335,10 +283,64 @@ class HTTP(object):
 				return message
 			return "HTTP/1.0 500 Internal Server Error\n"
 
+	def debug(self):
+		if self.type:
+			sys.stdout.write('type: ')
+			sys.stdout.write('\tcode: ')
+			print (self.type.code)
+			sys.stdout.write('\tname: ')
+			print (self.type.name)
+		else:
+			print ('type: None')
+		if self.url:
+			sys.stdout.write('url: ')
+			sys.stdout.write('\trawurl: ')
+			print (self.url.raw)
+			sys.stdout.write('\tprotocol: ')
+			print (self.url.protocol)
+			sys.stdout.write('\tdomain: ')
+			print (self.url.domain)
+			sys.stdout.write('\tport: ')
+			print (self.url.port)
+			sys.stdout.write('\tpath: ')
+			print (self.url.path)
+			sys.stdout.write('\tresource: ')
+			print (self.url.resource)
+			sys.stdout.write('\tquery: ')
+			print (self.url.query)
+			sys.stdout.write('\tfragment: ')
+			print (self.url.fragment)
+		else:
+			print ('url: None')
+		sys.stdout.write('version: ')
+		print (self.version)
+		sys.stdout.write('data: ')
+		print (self.data)
+		sys.stdout.write('useragent: ')
+		print (self.useragent)
+		sys.stdout.write('contenttype: ')
+		print (self.contenttype)
+		sys.stdout.write('contentlength: ')
+		print (self.contentlength)
+		sys.stdout.write('host: ')
+		print (self.host)
+		sys.stdout.write('accept: ')
+		print (self.accept)
+		sys.stdout.write('acceptlanguage: ')
+		print (self.acceptlanguage)
+		sys.stdout.write('acceptencoding: ')
+		print (self.acceptencoding)
+		sys.stdout.write('connection: ')
+		print (self.connection)
+		sys.stdout.write('status: ')
+		print (self.status)
+		sys.stdout.write('server: ')
+		print (self.server)
+
 	@staticmethod
 	def toJson(http):
 		return json.dumps(http.__dict__)
 
 	@staticmethod
-	def fromJson(json):
-		return json.loads(json, object_hook=lambda d: HTTP(**d))
+	def fromJson(jsonstr):
+		return json.loads(jsonstr, object_hook=lambda d: HTTP(**d))

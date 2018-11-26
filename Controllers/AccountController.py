@@ -3,13 +3,16 @@
 
 import sys
 
+sys.path.insert(0, '../DTO')
 sys.path.insert(0, '../Services')
 
 from HTTPService import HTTPType
 from HTTPService import StatusCode
-
+from HTTPService import HTTP
+from Error import Error
 from MainController import Controller
 from MainController import Resource
+from LoginRequest import LoginRequest
 
 
 class AccountController(Controller):
@@ -23,7 +26,7 @@ class AccountController(Controller):
 				login=LoginRequest.fromJson(request.data)
 				securityInfo=self.sql.getAccountSecurityInfo(login.email)
 				if securityInfo == None:
-					error=Error(str(404),{"pointer": request.url.path+request.url.resource},"Not found","Account not found on databse.")
+					error=Error(str(404),{"pointer": request.url.path+'/'+request.url.resource},"Not found","Account not found on databse.")
 					return HTTP(status=StatusCode.C404,data=Error.listToJson([error]),contenttype="application/json")
 				else:
 					hash=pbkdf2.PBKDF2(login.password,securityInfo["salt"],666).hexread(32)
@@ -31,7 +34,7 @@ class AccountController(Controller):
 						account=self.sql.getAccount(id=securityInfo["id"])
 						return HTTP(status=StatusCode.OK,data=Account.toJson(account),contenttype="application/json")
 					else:
-						error=Error(str(401),{"pointer": request.url.path+request.url.resource},"Unauthorized","Incorrect email or password.")
+						error=Error(str(401),{"pointer": request.url.path+'/'+request.url.resource},"Unauthorized","Incorrect email or password.")
 						return HTTP(status=StatusCode.C401,data=Error.listToJson([error]),contenttype="application/json")
-		error=Error(str(404),{"pointer": request.url.path+request.url.resource},"Not found","Resource not implemented on backend.")
+		error=Error(str(404),{"pointer": request.url.path+'/'+request.url.resource},"Not found","Resource not implemented on backend.")
 		return HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")

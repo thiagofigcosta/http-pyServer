@@ -43,7 +43,6 @@ class HttpBackendServer(object):
 		self.RECEIVE_TIMEOUT=0.2
 		self.time_removeacc=time.time() # TODO create class for events
 		self.CONSTANTHASHSTR="Now I am become Death, the destroyer of worlds."
-		self.SENDMAIL=True
 
 	def loop(self):
 		try:
@@ -99,12 +98,11 @@ class HttpBackendServer(object):
 		self.server_socket.close()
 		self.CLIENTS = []
 		self.logger.log("Bye <3")
-		if self.SENDMAIL:
-			try:
-				self.SendMail(self.GMAIL_EMAIL,"Servidor encerrado","Server endded\n"+"["+socket.gethostname()+" - "+str(int(round(time.time())))+"]",files=[logger.filename])
-			except Exception as e:
-				self.logger.log("Failed to send server end notification email",error=True)
-				self.handleException(e)
+		try:
+			self.email.SendMail(self.email.GMAIL_EMAIL,"Servidor encerrado","Server endded\n"+"["+socket.gethostname()+" - "+str(int(round(time.time())))+"]",files=[self.logger.filename])
+		except Exception as e:
+			self.logger.log("Failed to send server end notification email",error=True)
+			self.handleException(e)
 		sys.exit(0)
 
 
@@ -219,28 +217,37 @@ class HttpBackendServer(object):
 	def setupControllers(self):
 		self.logger.log("Setting Up controllers...")
 		self.mainCtrl=MainController(self.sql,"api")
-		self.mainCtrl.appendController(AccountController(self.sql,"login"))
+		self.mainCtrl.appendController(AccountController(self.sql,"acc"))
 
 	def requestHandler(self,sock,data):
 		try:
 			request=HTTP(data)
-			self.logger.log("request ["+request.type.name+" - "+request.url.path+request.url.resource+"] received from "+sock.TSname)
+			request.debug()
+			self.logger.log("request ["+request.type.name+" - "+request.url.path+'/'+request.url.resource+"] received from "+sock.TSname)
 			try:
-				response=self.mainCtrl.routeRequests()
+				response=self.mainCtrl.routeRequests(request)
 				self.Send(sock,response.toString())
 			except Exception as e:
 				errorstr=self.handleException(e)
 				error=Error(str(500),{"pointer": errorstr},"Internal Server Error","Error processing request.")
 				response=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
-				self.Send(sock,response.toString())
+				responsestr=response.toString()
+				self.Send(sock,responsestr)
 		except Exception as e:
 			errorstr=self.handleException(e)
 			error=Error(str(500),{"pointer": errorstr},"Internal Server Error","Error translating request.")
 			response=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
-			self.Send(sock,response.toString())
+			responsestr=response.toString()
+			self.Send(sock,responsestr)
+		try:#TODO check connection type before
+			sock.close()
+			self.CLIENTS.remove(sock)
+		except Exception as e:
+			self.handleException(e)
 
 
 if __name__ == "__main__":
-	server = HttpBackendServer("172.16.253.189")
+	server = HttpBackendServer()
+	# server = HttpBackendServer("172.16.253.189")
 	server.start()
 

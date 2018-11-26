@@ -20,8 +20,8 @@ class Address(object):
 		return json.dumps(address.__dict__)
 
 	@staticmethod
-	def fromJson(json):
-		return json.loads(json, object_hook=lambda d: Address(**d))
+	def fromJson(jsonstr):
+		return json.loads(jsonstr, object_hook=lambda d: Address(**d))
 
 	@staticmethod
 	def listToJson(addresses):

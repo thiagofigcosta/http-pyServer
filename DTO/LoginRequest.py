@@ -14,7 +14,7 @@ class LoginRequest(object):
 		return json.dumps(login.__dict__)
 
 	@staticmethod
-	def fromJson(json):
-		return json.loads(json, object_hook=lambda d: LoginRequest(**d))
+	def fromJson(jsonstr):
+		return json.loads(jsonstr, object_hook=lambda d: LoginRequest(**d))
 
 		

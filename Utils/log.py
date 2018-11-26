@@ -30,6 +30,7 @@ class Logger(object):
 		if printonscreen:
 			if error:
 				sys.stderr.write(formatted_message+'\n')
+				sys.stderr.flush()
 			else:
 				print (formatted_message)
 		formatted_message+='\n'
