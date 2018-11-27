@@ -259,6 +259,6 @@ class HttpBackendServer(object):
 
 if __name__ == "__main__":
 	server = HttpBackendServer()
-	# server = HttpBackendServer("192.168.0.14")
+	# server = HttpBackendServer("31.220.54.249")
 	server.start()
 
