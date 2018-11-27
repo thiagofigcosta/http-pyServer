@@ -1,0 +1,9 @@
+[Unit]
+Description=Start NYX App beck-end
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+WorkingDirectory=/root/http-pyServer/
+ExecStart=/root/http-pyServer/start.sh
+ExecStop=/root/http-pyServer/stop.sh
