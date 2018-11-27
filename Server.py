@@ -156,7 +156,7 @@ class HttpBackendServer(object):
 				emailpass=emailpassfile.read().replace('\n', '')
 		except:
 			pass
-		self.email=EmailService(self,"nyxapp@gmail.com",emailpass)
+		self.email=EmailService(self,"nyxapp2018@gmail.com",emailpass)
 		self.setupControllers()
 		self.logger.log("Configuring server...")
 		self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -224,24 +224,28 @@ class HttpBackendServer(object):
 
 	def requestHandler(self,sock,data):
 		try:
+			print (data)
 			request=HTTP(data)
 			request.client=sock.TSname
 			# TODO check host and other info
 			request.debug()
-			self.logger.log("request ["+request.type.name+" - "+request.url.path+'/'+request.url.resource+"] received from "+sock.TSname)
+			self.logger.log("Request ["+request.type.name+" - "+request.url.path+'/'+request.url.resource+"] received from "+sock.TSname)
 			try:
-				response=self.mainCtrl.routeRequests(request)
+				response=self.mainCtrl.routeRequest(request)
+				self.logger.log("Response ["+str(response.status.code)+": "+response.status.name+" - "+request.url.path+'/'+request.url.resource+"] sented to "+sock.TSname)
 				self.Send(sock,response.toString())
 			except Exception as e:
 				errorstr=self.handleException(e)
 				error=Error(str(500),{"pointer": errorstr},"Internal Server Error","Error processing request.")
 				response=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
+				self.logger.log("Response ["+str(response.status.code)+": "+response.status.name+" - "+request.url.path+'/'+request.url.resource+"] sented to "+sock.TSname)
 				responsestr=response.toString()
 				self.Send(sock,responsestr)
 		except Exception as e:
 			errorstr=self.handleException(e)
 			error=Error(str(500),{"pointer": errorstr},"Internal Server Error","Error translating request.")
 			response=HTTP(status=StatusCode.C500,data=Error.listToJson([error]),contenttype="application/json")
+			self.logger.log("Response ["+str(response.status.code)+": "+response.status.name+" - "+request.url.path+'/'+request.url.resource+"] sented to "+sock.TSname)
 			responsestr=response.toString()
 			self.Send(sock,responsestr)
 		try:# TODO check connection type before close-it
@@ -252,7 +256,7 @@ class HttpBackendServer(object):
 
 
 if __name__ == "__main__":
-	server = HttpBackendServer()
-	# server = HttpBackendServer("172.16.253.189")
+	# server = HttpBackendServer()
+	server = HttpBackendServer("192.168.0.14")
 	server.start()
 

@@ -3,7 +3,15 @@
 import psycopg2
 import time
 import json
+import sys
 
+sys.path.insert(0, '../Models')
+
+from Account import Account
+# from Address import Address
+# from Event import Event
+# from MusicGenre import MusicGenre
+# from Nightclub import Nightclub
 
 class SQLService(object):
 	def __init__(self):

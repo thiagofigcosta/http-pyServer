@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import socket
+import time
 import smtplib
 import getpass
 from email.mime.application import MIMEApplication
@@ -9,6 +11,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email import Charset
 from email.generator import Generator
+from cStringIO import StringIO
 
 class EmailService(object):
 

@@ -4,12 +4,13 @@
 import json
 
 class RegisterAccRequest(object):
-	def __init__(self, firstname, lastname, cpf, email, password):
+	def __init__(self, firstname, lastname, cpf, email, password, accesslevel=3):
 		self.firstname=firstname.strip()
 		self.lastname=lastname.strip()
 		self.cpf=cpf.strip()
 		self.email=email.strip()
 		self.password=password.strip()
+		self.accesslevel=accesslevel
 
 	@staticmethod
 	def toJson(obj):

@@ -40,7 +40,10 @@ class MainController(Controller): # TODO assign callback to resources to not imp
 	def appendController(self,controller):
 		self.controllers.append(controller)
 
-	def routeRequests(self,request):
+	def routeRequest(self,request):
+		if request.data==None and request.type==HTTPType.POST:
+			error=Error(str(400),{"pointer": request.url.path},"Bad Request","POST request whitout data.")
+			return HTTP(status=StatusCode.C400,data=Error.listToJson([error]),contenttype="application/json")
 		for controller in self.controllers:
 			if request.url.path==controller.path:
 				return controller.handle(request)

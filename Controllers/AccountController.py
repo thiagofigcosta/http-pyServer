@@ -6,6 +6,7 @@ import sys
 sys.path.insert(0, '../DTO')
 sys.path.insert(0, '../Services')
 sys.path.insert(0, '../Utils')
+sys.path.insert(0, '../Models')
 
 from HTTPService import HTTPType
 from HTTPService import StatusCode
@@ -20,6 +21,7 @@ from RGenerator import RGenerator
 from CheckTokenRequest import CheckTokenRequest
 from ResetPasswordRequest import ResetPasswordRequest
 from LoginTokenRequest import LoginTokenRequest
+from Account import Account
 
 class AccountController(Controller):
 	def __init__(self, server, path):
@@ -154,7 +156,7 @@ class AccountController(Controller):
 		if token_sys!=None:
 			if token_sys==reset.token:
 				salt=RGenerator.genSalt()
-				hash=pbkdf2.PBKDF2(token.newpassword,salt,666).hexread(32)
+				hash=PBKDF2(token.newpassword,salt,666).hexread(32)
 				modifier=request.client
 				self.sql.updateAccountPassword(hash,salt,email=reset.email)
 				self.sql.disableRenewPassToken(modifier,email=reset.email)
