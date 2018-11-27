@@ -4,12 +4,14 @@
 import json
 
 class RegisterEventRequest(object):
-	def __init__(self, name, ticketprice, minimumage, startate, enddate):
+	def __init__(self, name, ticketprice, minimumage, startdate, enddate, club_id, mgenreslist):
 		self.name=name.strip()
 		self.ticketprice=ticketprice
 		self.minimumage=minimumage
-		self.startate=startate
+		self.startdate=startdate
 		self.enddate=enddate
+		self.club_id=club_id
+		self.mgenreslist=mgenreslist
 
 
 	@staticmethod

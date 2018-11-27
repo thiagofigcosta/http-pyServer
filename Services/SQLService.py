@@ -113,17 +113,31 @@ class SQLService(object):
 				nightclubs.append(Nightclub(nightclub[0],nightclub[1],nightclub[2],nightclub[3],nightclub[4],Address(addr[0],addr[1],addr[2],addr[3],addr[4],addr[5],addr[6],addr[7],addr[8]),nightclub[6]))
 		return nightclubs
 
+	def getAddressId(self,zipcode, street, number, xtrainfo, district, city, state, country):
+		self.query.execute("SELECT id FROM addresses WHERE zipcode="+str(zipcode)+" AND street='"+street+"' AND number="+str(number)+" AND xtrainfo='"+xtrainfo+"' AND district='"+district+"' AND city='"+city+"' AND state='"+state+"' AND country='"+country+"' LIMIT 1;")
+		result=self.query.fetchone()
+		if result:
+			return result[0]
+		return None
+
+	def getEventId(self, name, ticketprice, minimumage, startdate, enddate):
+		self.query.execute("SELECT id FROM events WHERE name='"+name+"' AND ticketprice="+str(ticketprice)+" AND minimumage="+str(minimumage)+" AND startdate="+str(startdate)+" AND enddate="+str(enddate)+" LIMIT 1;")
+		result=self.query.fetchone()
+		if result:
+			return result[0]
+		return None
+
 	def getEvents(self):
 		self.query.execute("SELECT  E.id, E.name, E.ticketprice, E.minimumage, E.startdate, E.enddate,NE.id_nightclub FROM events E INNER JOIN nightclubevents NE ON E.id=NE.id_event;")
 		result = list(self.query)
 		events=[]
 		for event in result:
-			self.query.execute("SELECT M.id,M.name FROM musicgenres INNER JOIN eventmusicgenres EM ON M.id=EM.id_genre WHERE EM.id_event="+event[0]+";")
+			self.query.execute("SELECT M.id,M.name FROM musicgenres M INNER JOIN eventmusicgenres EM ON M.id=EM.id_genre WHERE EM.id_event="+str(event[0])+";")
 			result2 = list(self.query)
 			genres=[]
 			for genre in result2:
 				genres.append(MusicGenre(genre[0],genre[1]))
-			events.append(Event(event[0],event[1],event[2],event[3],event[4],event[5],genres,event[6]))
+			events.append(Event(event[0],event[1],float(str(event[2])),event[3],event[4],event[5],genres,event[6]))
 		return events
 
 	def getEventsFromNClub(self,id_nightclub):
@@ -131,12 +145,12 @@ class SQLService(object):
 		result = list(self.query)
 		events=[]
 		for event in result:
-			self.query.execute("SELECT M.id,M.name FROM musicgenres INNER JOIN eventmusicgenres EM ON M.id=EM.id_genre WHERE EM.id_event="+event[0]+";")
+			self.query.execute("SELECT M.id,M.name FROM musicgenres M INNER JOIN eventmusicgenres EM ON M.id=EM.id_genre WHERE EM.id_event="+str(event[0])+";")
 			result2 = list(self.query)
 			genres=[]
 			for genre in result2:
 				genres.append(MusicGenre(genre[0],genre[1]))
-			events.append(Event(event[0],event[1],event[2],event[3],event[4],event[5],genres,event[6]))
+			events.append(Event(event[0],event[1],float(str(event[2])),event[3],event[4],event[5],genres,event[6]))
 		return events
 
 	def getMusicgenres(self):
@@ -148,7 +162,7 @@ class SQLService(object):
 		return genres
 
 	def getMusicgenresFromEvent(self,id_events):
-		self.query.execute("SELECT M.id,M.name FROM musicgenres INNER JOIN eventmusicgenres EM ON M.id=EM.id_genre WHERE EM.id_event="+str(id_events)+";")
+		self.query.execute("SELECT M.id,M.name FROM musicgenres M INNER JOIN eventmusicgenres EM ON M.id=EM.id_genre WHERE EM.id_event="+str(id_events)+";")
 		result = list(self.query)
 		genres=[]
 		for genre in result:
@@ -156,6 +170,14 @@ class SQLService(object):
 		return genres
 
 	##########
+
+	def linkEventAndClub(self,nightclub_id,event_id):
+		self.query.execute("INSERT INTO nightclubevents(\"id_nightclub\",\"id_event\") VALUES ("+str(nightclub_id)+","+str(event_id)+");")
+		self.conn.commit()
+
+	def linkGenreAndEvent(self,genre_id,event_id):
+		self.query.execute("INSERT INTO eventmusicgenres(\"id_event\",\"id_genre\") VALUES ("+str(event_id)+","+str(genre_id)+");")
+		self.conn.commit()
 
 	def checkIfAccountExists(self,id=None,email=None):
 		if (email==None and id!=None):
@@ -174,13 +196,6 @@ class SQLService(object):
 	def checkIfNCExists(self,id):
 		self.query.execute("SELECT COUNT(*) FROM nightclubs WHERE id="+str(id)+";")
 		return self.query.fetchone()[0]!=0
-
-	def getAddressId(self,zipcode, street, number, xtrainfo, district, city, state, country):
-		self.query.execute("SELECT id FROM addresses WHERE zipcode="+str(zipcode)+" AND street='"+street+"' AND number="+str(number)+" AND xtrainfo='"+xtrainfo+"' AND district='"+district+"' AND city='"+city+"' AND state='"+state+"' AND country='"+country+"' LIMIT 1;")
-		result=self.query.fetchone()
-		if result:
-			return result[0]
-		return None
 
 	def updateAccountToken(self,email=None,id=None,token="NOPS"):
 		if (email==None and id!=None):
