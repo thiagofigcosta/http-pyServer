@@ -224,7 +224,6 @@ class HttpBackendServer(object):
 
 	def requestHandler(self,sock,data):
 		try:
-			print (data)
 			request=HTTP(data)
 			request.client=sock.TSname
 			# TODO check host and other info

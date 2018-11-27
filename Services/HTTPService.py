@@ -172,6 +172,7 @@ class HTTP(object):
 			self.status=None
 			self.server=None
 			self.client=None
+			self.accesscrossorigin=None
 
 			lines=requestdata.split('\n')
 			nlines=len(lines)
@@ -219,6 +220,8 @@ class HTTP(object):
 								self.acceptencoding=value
 							elif field=="Connection":
 								self.connection=value
+							elif field=="Access-Control-Allow-Origin":
+								self.accesscrossorigin=value
 							else:
 								print ("Unimplemented field: "+field)
 				else:
@@ -234,6 +237,7 @@ class HTTP(object):
 			self.acceptlanguage=None
 			self.acceptencoding=None
 			self.connection=None
+			self.accesscrossorigin="*"
 
 			self.type=HTTPType.Response
 			self.status=status
@@ -249,6 +253,8 @@ class HTTP(object):
 		if self.type==HTTPType.Response:
 			if self.status:
 				message="HTTP/"+str(self.version)+' '+str(self.status.code)+' '+self.status.name+'\n'
+				if self.accesscrossorigin:
+					message+="Access-Control-Allow-Origin: "+self.accesscrossorigin+'\n'
 				if self.server:
 					message+="Server: "+self.server+'\n'
 				if self.contenttype:
@@ -265,6 +271,8 @@ class HTTP(object):
 				message=self.type.name+' '+self.url.raw+' '+"HTTP/"+str(self.version)+'\n'
 				if self.useragent:
 					message+="User-Agent: "+self.useragent+'\n'
+				if self.accesscrossorigin:
+					message+="Access-Control-Allow-Origin: "+self.accesscrossorigin+'\n'
 				if self.contenttype:
 					message+="Content-Type: "+self.contenttype+'\n'
 				if self.host:

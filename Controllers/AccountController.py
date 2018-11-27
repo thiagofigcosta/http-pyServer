@@ -121,8 +121,8 @@ class AccountController(Controller):
 	def checkToken(self,request):
 		cktoken=CheckTokenRequest.fromJson(request.data)
 		acc=self.sql.getAccount(email=cktoken.email)
-		if acc.active==token:
-			self.sql.updateAccountToken(email=email,token="Active")
+		if acc.active==cktoken.token:
+			self.sql.updateAccountToken(email=cktoken.email,token="Active")
 			return HTTP(status=StatusCode.OK,data="Account activated.",contenttype="text/plain")
 		else:
 			error=Error(str(401),{"pointer": request.url.path+'/'+request.url.resource},"Unauthorized","Incorrect token.")
