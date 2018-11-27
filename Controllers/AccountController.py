@@ -156,7 +156,7 @@ class AccountController(Controller):
 		if token_sys!=None:
 			if token_sys==reset.token:
 				salt=RGenerator.genSalt()
-				hash=PBKDF2(token.newpassword,salt,666).hexread(32)
+				hash=PBKDF2(reset.newpassword,salt,666).hexread(32)
 				modifier=request.client
 				self.sql.updateAccountPassword(hash,salt,email=reset.email)
 				self.sql.disableRenewPassToken(modifier,email=reset.email)

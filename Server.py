@@ -15,6 +15,7 @@ from cStringIO import StringIO
 # Folder inclusions
 sys.path.insert(0, 'Controllers')
 sys.path.insert(0, 'DTO')
+sys.path.insert(0, 'Models')
 sys.path.insert(0, 'Services')
 sys.path.insert(0, 'Utils')
 
@@ -23,6 +24,7 @@ from Error import Error
 from log import Logger
 from MainController import MainController
 from AccountController import AccountController
+from MusicgenreController import MusicgenreController
 from NightclubController import NightclubController
 from EventController import EventController
 from EmailService import EmailService
@@ -220,7 +222,8 @@ class HttpBackendServer(object):
 		self.mainCtrl=MainController(self,"api")
 		self.mainCtrl.appendController(AccountController(self,"acc"))
 		self.mainCtrl.appendController(NightclubController(self,"nclub"))
-		self.mainCtrl.appendController(EventController(self,"nclub/event"))
+		self.mainCtrl.appendController(EventController(self,"nclub/event")) 
+		self.mainCtrl.appendController(MusicgenreController(self,"musicgenre"))
 
 	def requestHandler(self,sock,data):
 		try:
@@ -255,7 +258,7 @@ class HttpBackendServer(object):
 
 
 if __name__ == "__main__":
-	# server = HttpBackendServer()
-	server = HttpBackendServer("192.168.0.14")
+	server = HttpBackendServer()
+	# server = HttpBackendServer("192.168.0.14")
 	server.start()
 
